@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Health Vectors · WhatsApp v4.1 (consent + expert analysis, severe-case template)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     WhatsApp Business Cloud API · native message types only.
+     No custom banners, no in-bubble charts, no gradient avatars,
+     no coloured action pills.  Everything below is a shape you
+     can actually send via a payload: text (with markdown),
+     image (caption), document (filename + caption), location,
+     interactive.button, interactive.list, interactive.cta_url,
+     template (with a category note), reaction.
+     ============================================================ */
+  :root{
+    --wa-wallpaper:#e5ddd5;
+    --wa-header-bg:#008069;      /* WA Android header green */
+    --wa-header-fg:#ffffff;
+    --wa-header-sub:rgba(255,255,255,.82);
+    --wa-in-bg:#ffffff;
+    --wa-in-fg:#111b21;
+    --wa-out-bg:#d9fdd3;
+    --wa-out-fg:#111b21;
+    --wa-quote-bar:#06cf9c;
+    --wa-quote-author:#008069;
+    --wa-quote-text:#54656f;
+    --wa-quote-bg-in:#f5f6f6;
+    --wa-quote-bg-out:#c8f0c0;
+    --wa-meta:#667781;
+    --wa-tick:#53bdeb;
+    --wa-link:#039be5;
+    --wa-accent:#008069;          /* WA Android accent */
+    --wa-hairline:rgba(0,0,0,.08);
+    --wa-datechip-bg:#ffffff;
+    --wa-datechip-fg:#54656f;
+    --wa-sysnote-bg:#fdf4c5;      /* WA e2e-encryption yellow note */
+    --wa-sysnote-fg:#54656f;
+    --wa-shadow:0 1px .5px rgba(11,20,26,.13);
+    --wa-verified:#25d366;
+    --wa-inputbar-bg:#f0f2f5;
+    --wa-input-bg:#ffffff;
+    --wa-input-fg:#3b4a54;
+    --wa-input-ph:#8696a0;
+    --wa-sheet-bg:#ffffff;
+    --wa-sheet-fg:#111b21;
+    --wa-sheet-sub:#667781;
+    --wa-sheet-hairline:#eceff1;
+    --wa-radio:#c2c9ce;
+    --wa-overlay:rgba(11,20,26,.55);
+    --wa-frame:#000;
+    --wa-page:#c9d0d4;
+    --wa-typing:#8696a0;
+    --wa-doc-bg:rgba(0,0,0,.06);
+    --wa-doc-bg-out:rgba(255,255,255,.35);
+    --wa-btn-fg:#008069;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --wa-wallpaper:#0b141a;
+      --wa-header-bg:#1f2c33;
+      --wa-header-fg:#e9edef;
+      --wa-header-sub:#8696a0;
+      --wa-in-bg:#202c33;
+      --wa-in-fg:#e9edef;
+      --wa-out-bg:#005c4b;
+      --wa-out-fg:#e9edef;
+      --wa-quote-bar:#06cf9c;
+      --wa-quote-author:#00a884;
+      --wa-quote-text:#8696a0;
+      --wa-quote-bg-in:#1d282f;
+      --wa-quote-bg-out:#025144;
+      --wa-meta:#8696a0;
+      --wa-tick:#53bdeb;
+      --wa-link:#53bdeb;
+      --wa-accent:#00a884;
+      --wa-hairline:rgba(255,255,255,.08);
+      --wa-datechip-bg:#182229;
+      --wa-datechip-fg:#8696a0;
+      --wa-sysnote-bg:#182229;
+      --wa-sysnote-fg:#8696a0;
+      --wa-shadow:0 1px .5px rgba(0,0,0,.35);
+      --wa-inputbar-bg:#1f2c33;
+      --wa-input-bg:#2a3942;
+      --wa-input-fg:#d1d7db;
+      --wa-input-ph:#8696a0;
+      --wa-sheet-bg:#233138;
+      --wa-sheet-fg:#e9edef;
+      --wa-sheet-sub:#8696a0;
+      --wa-sheet-hairline:#2a3942;
+      --wa-radio:#57676f;
+      --wa-page:#0a0f12;
+      --wa-doc-bg:rgba(255,255,255,.08);
+      --wa-doc-bg-out:rgba(255,255,255,.12);
+      --wa-btn-fg:#00a884;
+    }
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:"Roboto",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--wa-page);color:var(--wa-in-fg);
+    display:flex;align-items:center;justify-content:center;min-height:100dvh;
+  }
+
+  .device{
+    position:relative;width:100%;max-width:420px;height:100dvh;max-height:920px;
+    background:var(--wa-wallpaper);display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);
+  }
+  @media (min-width:520px){
+    .device{border-radius:34px;border:11px solid var(--wa-frame);height:min(920px,96dvh)}
+  }
+  .wallpaper{position:absolute;inset:0;z-index:0;background:var(--wa-wallpaper)}
+  .wallpaper::before{content:"";position:absolute;inset:0;background-image:var(--doodle);background-size:340px 340px;opacity:.5}
+  :root[data-theme="dark"] .wallpaper::before,
+  :root:not([data-theme="light"]) .wallpaper::before{opacity:.10}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wallpaper::before{opacity:.10}}
+
+  /* -------- status bar -------- */
+  .statusbar{
+    position:relative;z-index:5;flex:0 0 auto;background:var(--wa-header-bg);color:var(--wa-header-fg);
+    display:flex;align-items:center;justify-content:space-between;padding:6px 16px 2px;font-size:13px;font-weight:500;
+  }
+  .statusbar .sb-right{display:flex;align-items:center;gap:6px}
+  .statusbar svg{display:block;fill:currentColor}
+
+  /* -------- header (Android WA style: green bar) -------- */
+  .header{
+    position:relative;z-index:5;flex:0 0 auto;background:var(--wa-header-bg);color:var(--wa-header-fg);
+    display:flex;align-items:center;gap:6px;padding:6px 6px 10px;box-shadow:0 1px 3px rgba(0,0,0,.10);
+  }
+  .icon-btn{background:none;border:0;padding:8px;border-radius:50%;cursor:pointer;
+    color:var(--wa-header-fg);display:inline-flex;align-items:center;justify-content:center}
+  .icon-btn:hover{background:rgba(255,255,255,.12)}
+  .avatar{
+    width:40px;height:40px;border-radius:50%;flex:0 0 auto;background:#fff;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(0,0,0,.08);
+  }
+  .avatar img{width:34px;height:auto;display:block}
+  .peer{display:flex;flex-direction:column;justify-content:center;min-width:0;flex:1;cursor:pointer;line-height:1.15;padding-left:2px}
+  .peer .name{display:flex;align-items:center;gap:5px;font-size:16.5px;font-weight:500;color:var(--wa-header-fg)}
+  .peer .name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peer .sub{font-size:12.5px;color:var(--wa-header-sub)}
+  .verified{color:#fff;flex:0 0 auto;background:var(--wa-verified);border-radius:50%;padding:1px}
+
+  /* -------- chat area -------- */
+  .chat{
+    position:relative;z-index:2;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;padding:10px 6% 14px;
+    display:flex;flex-direction:column;gap:2px;scroll-behavior:smooth;
+  }
+  .chat::-webkit-scrollbar{width:6px}
+  .chat::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:6px}
+
+  .datechip-wrap{display:flex;justify-content:center;margin:12px 0 8px}
+  .datechip{background:var(--wa-datechip-bg);color:var(--wa-datechip-fg);
+    font-size:12.5px;font-weight:500;padding:5px 12px;border-radius:8px;box-shadow:var(--wa-shadow)}
+
+  .sysnote-wrap{display:flex;justify-content:center;margin:6px 0}
+  .sysnote{background:var(--wa-sysnote-bg);color:var(--wa-sysnote-fg);
+    font-size:12px;line-height:1.4;padding:7px 12px;border-radius:8px;max-width:90%;text-align:center;box-shadow:var(--wa-shadow)}
+  .sysnote .lock{vertical-align:-2px;margin-right:5px}
+
+  .row{display:flex;margin-top:2px}
+  .row.in{justify-content:flex-start}
+  .row.out{justify-content:flex-end}
+  .row.grouped{margin-top:1px}
+
+  /* -------- bubble -------- */
+  .bubble{
+    position:relative;max-width:82%;padding:6px 8px 8px 9px;border-radius:8px;box-shadow:var(--wa-shadow);
+    font-size:14.6px;line-height:1.34;word-wrap:break-word;overflow-wrap:anywhere;animation:pop .16s ease;
+  }
+  @keyframes pop{from{transform:translateY(3px) scale(.99);opacity:.4}to{transform:none;opacity:1}}
+  @media (prefers-reduced-motion:reduce){.bubble{animation:none}}
+  .row.in .bubble{background:var(--wa-in-bg);color:var(--wa-in-fg);border-top-left-radius:0}
+  .row.out .bubble{background:var(--wa-out-bg);color:var(--wa-out-fg);border-top-right-radius:0}
+  .row.grouped .bubble{border-radius:8px}
+  .row.in:not(.grouped) .bubble::before,
+  .row.out:not(.grouped) .bubble::before{content:"";position:absolute;top:0;width:9px;height:13px}
+  .row.in:not(.grouped) .bubble::before{left:-8px;background:var(--wa-in-bg);clip-path:polygon(100% 0,100% 100%,0 0)}
+  .row.out:not(.grouped) .bubble::before{right:-8px;background:var(--wa-out-bg);clip-path:polygon(0 0,0 100%,100% 0)}
+
+  .btext{white-space:pre-wrap}
+  .btext strong{font-weight:700}
+  .btext em{font-style:italic}
+  .btext s{opacity:.9}
+  .btext code{font-family:"Roboto Mono",Menlo,Consolas,monospace;background:rgba(0,0,0,.06);padding:1px 4px;border-radius:3px;font-size:13px}
+  .btext code.mono-block{display:block;padding:8px 10px;margin:6px 0;font-size:12.5px;line-height:1.5;white-space:pre;overflow-x:auto}
+  :root[data-theme="dark"] .btext code,:root:not([data-theme="light"]) .btext code{background:rgba(255,255,255,.08)}
+  .btext a{color:var(--wa-link);text-decoration:none}
+  .btext a:hover{text-decoration:underline}
+
+  .meta{float:right;margin:2px 0 -4px 10px;font-size:11px;color:var(--wa-meta);
+    display:inline-flex;align-items:center;gap:3px;white-space:nowrap;transform:translateY(4px)}
+  .meta .ticks{color:var(--wa-tick);display:inline-flex}
+
+  /* -------- image bubble (WA native image message) -------- */
+  .wa-image{width:calc(100% + 17px);margin:-6px -8px 6px -9px;border-radius:8px 8px 0 0;overflow:hidden;display:block}
+  .wa-image img{width:100%;height:auto;display:block}
+
+  /* -------- document bubble (WA native document message) -------- */
+  .wa-doc{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--wa-doc-bg);
+    border-radius:6px;margin:0 0 4px;
+  }
+  .row.out .wa-doc{background:var(--wa-doc-bg-out)}
+  .wa-doc .ico{
+    width:34px;height:40px;flex:0 0 auto;position:relative;
+    background:#e34c3c;border-radius:3px;display:flex;align-items:flex-end;justify-content:center;
+    color:#fff;font-size:10px;font-weight:700;padding-bottom:3px;letter-spacing:.5px;
+    box-shadow:0 1px 2px rgba(0,0,0,.15);
+  }
+  .wa-doc .ico::before{content:"";position:absolute;top:0;right:0;width:10px;height:10px;background:rgba(255,255,255,.35);
+    clip-path:polygon(0 0,100% 100%,100% 0)}
+  .wa-doc .info{flex:1;min-width:0}
+  .wa-doc .fname{font-size:14px;font-weight:500;color:var(--wa-in-fg);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row.out .wa-doc .fname{color:var(--wa-out-fg)}
+  .wa-doc .fmeta{font-size:12px;color:var(--wa-meta);margin-top:2px}
+  .wa-doc .dl{color:var(--wa-meta);flex:0 0 auto}
+
+  /* -------- location bubble (WA native location message) -------- */
+  .wa-loc{width:calc(100% + 17px);margin:-6px -8px 6px -9px;border-radius:8px 8px 0 0;overflow:hidden;position:relative;
+    background:#dfe5ea;height:150px}
+  .wa-loc svg{width:100%;height:100%;display:block}
+  .wa-loc .pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);
+    width:30px;height:30px;color:#ea4335}
+  .wa-loc + .loc-meta{padding:2px 4px 2px 4px}
+  .loc-meta .lname{font-size:14px;font-weight:500;color:var(--wa-in-fg)}
+  .row.out .loc-meta .lname{color:var(--wa-out-fg)}
+  .loc-meta .laddr{font-size:12.5px;color:var(--wa-meta);margin-top:2px;line-height:1.35}
+
+  /* -------- interactive: header (text) -------- */
+  .ix-header{font-size:15px;font-weight:700;margin:2px 0 6px;color:var(--wa-in-fg);line-height:1.25}
+  .row.out .ix-header{color:var(--wa-out-fg)}
+
+  /* -------- interactive: footer text -------- */
+  .ix-footer{font-size:12.5px;color:var(--wa-meta);margin-top:6px;line-height:1.35}
+
+  /* -------- interactive: reply buttons (WA quick-reply row, hairline separated, accent colour) -------- */
+  .qr{display:flex;flex-direction:column;gap:1px;margin:6px -8px -8px -9px}
+  .qr button{
+    border:0;border-top:1px solid var(--wa-hairline);background:none;color:var(--wa-btn-fg);
+    font-weight:500;font-size:14.6px;font-family:inherit;padding:11px 8px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+  }
+  .qr button:last-child{border-bottom-left-radius:8px;border-bottom-right-radius:8px}
+  .qr button:hover{background:rgba(0,128,105,.06)}
+  .qr button:disabled{color:var(--wa-meta);cursor:default}
+  .qr button:disabled:hover{background:none}
+  .qr svg{opacity:.8}
+
+  /* -------- interactive: list opener + cta_url (same shape · one accent row) -------- */
+  .list-opener,.cta-url{
+    margin:6px -8px -8px -9px;padding:11px 8px;border-top:1px solid var(--wa-hairline);
+    display:flex;align-items:center;justify-content:center;gap:9px;color:var(--wa-btn-fg);
+    font-weight:500;font-size:14.6px;cursor:pointer;
+    border-bottom-left-radius:8px;border-bottom-right-radius:8px;
+  }
+  .list-opener:hover,.cta-url:hover{background:rgba(0,128,105,.06)}
+  .list-opener[disabled],.cta-url[disabled]{opacity:.5;cursor:default}
+  .list-opener[disabled]:hover,.cta-url[disabled]:hover{background:none}
+
+  /* -------- reaction (WA emoji reaction, floats below a message) -------- */
+  .rx{
+    position:absolute;bottom:-11px;right:8px;background:var(--wa-in-bg);
+    border-radius:14px;padding:2px 7px 2px 4px;font-size:13px;box-shadow:0 1px 2px rgba(0,0,0,.15);
+    display:inline-flex;align-items:center;gap:2px;
+  }
+  .row.out .rx{background:var(--wa-in-bg)}
+
+  /* -------- typing dots -------- */
+  .typing .bubble{padding:12px 14px}
+  .dots{display:inline-flex;gap:4px;align-items:center}
+  .dots i{width:7px;height:7px;border-radius:50%;background:var(--wa-typing);animation:blink 1.2s infinite ease-in-out}
+  .dots i:nth-child(2){animation-delay:.18s}
+  .dots i:nth-child(3){animation-delay:.36s}
+  @keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+
+  /* -------- composer (real WA layout: pill w/ emoji + attach + camera, mic/send FAB) -------- */
+  .inputbar{position:relative;z-index:5;flex:0 0 auto;background:var(--wa-inputbar-bg);padding:7px 8px 9px;
+    display:flex;align-items:flex-end;gap:7px}
+  .composer{flex:1;background:var(--wa-input-bg);border-radius:24px;display:flex;align-items:center;gap:6px;
+    padding:6px 8px 6px 12px;min-height:46px;box-shadow:0 1px .5px rgba(0,0,0,.08)}
+  .composer .emoji{color:var(--wa-input-ph);display:inline-flex;flex:0 0 auto}
+  .composer input{flex:1;border:0;background:none;outline:none;font-family:inherit;font-size:16px;color:var(--wa-input-fg);padding:6px 2px;min-width:0}
+  .composer input::placeholder{color:var(--wa-input-ph)}
+  .composer .cbtn{color:var(--wa-input-ph);display:inline-flex;flex:0 0 auto;padding:4px;background:none;border:0;cursor:pointer}
+  .send-fab{width:46px;height:46px;flex:0 0 auto;border-radius:50%;border:0;cursor:pointer;background:var(--wa-accent);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  .send-fab:hover{filter:brightness(1.05)}
+
+  /* -------- scroll-to-bottom pill -------- */
+  .scrolldown{position:absolute;right:14px;bottom:78px;z-index:6;width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;
+    background:var(--wa-in-bg);color:var(--wa-meta);box-shadow:0 2px 6px rgba(0,0,0,.25);
+    display:none;align-items:center;justify-content:center}
+  .scrolldown.show{display:inline-flex}
+
+  /* -------- bottom sheet (WA List message) -------- */
+  .sheet-overlay{position:absolute;inset:0;z-index:40;background:var(--wa-overlay);opacity:0;pointer-events:none;transition:opacity .22s ease}
+  .sheet-overlay.open{opacity:1;pointer-events:auto}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:41;background:var(--wa-sheet-bg);color:var(--wa-sheet-fg);
+    border-top-left-radius:16px;border-top-right-radius:16px;max-height:80%;display:flex;flex-direction:column;
+    transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-shadow:0 -6px 24px rgba(0,0,0,.25)}
+  .sheet.open{transform:translateY(0)}
+  @media (prefers-reduced-motion:reduce){.sheet{transition:none}}
+  .sheet-grip{width:36px;height:4px;border-radius:3px;background:var(--wa-radio);margin:8px auto 2px}
+  .sheet-head{display:flex;align-items:center;gap:18px;padding:10px 18px 12px}
+  .sheet-head .x{background:none;border:0;cursor:pointer;color:var(--wa-sheet-fg);display:inline-flex;padding:4px}
+  .sheet-head .title{font-size:18px;font-weight:500}
+  .sheet-list{overflow-y:auto;padding-bottom:16px}
+  .sheet-section{padding:12px 18px 6px;font-size:13px;font-weight:600;color:var(--wa-accent);
+    text-transform:uppercase;letter-spacing:.4px;border-top:1px solid var(--wa-sheet-hairline)}
+  .sheet-section:first-child{border-top:0}
+  .sheet-row{display:flex;align-items:flex-start;gap:14px;padding:12px 18px;cursor:pointer}
+  .sheet-row:hover{background:rgba(0,0,0,.03)}
+  :root[data-theme="dark"] .sheet-row:hover,:root:not([data-theme="light"]) .sheet-row:hover{background:rgba(255,255,255,.04)}
+  .sheet-row .rtxt{flex:1;min-width:0}
+  .sheet-row .rtitle{font-size:15.5px;color:var(--wa-sheet-fg);line-height:1.3;font-weight:500}
+  .sheet-row .rdesc{font-size:13px;color:var(--wa-sheet-sub);margin-top:2px;line-height:1.35}
+  .sheet-row .radio{width:20px;height:20px;border:2px solid var(--wa-radio);border-radius:50%;flex:0 0 auto;margin-top:2px;
+    display:flex;align-items:center;justify-content:center}
+  .sheet-foot{text-align:center;color:var(--wa-sheet-sub);font-size:12.5px;padding:6px 18px 18px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <div class="wallpaper" aria-hidden="true"></div>
+
+  <div class="statusbar" aria-hidden="true">
+    <span>11:35</span>
+    <span class="sb-right">
+      <svg width="17" height="13" viewBox="0 0 17 13"><path d="M8.5 2.4c2.2 0 4.2.8 5.7 2.2l1.2-1.3C13.6 1.6 11.1.6 8.5.6S3.4 1.6 1.6 3.3l1.2 1.3C4.3 3.2 6.3 2.4 8.5 2.4zM8.5 6c1.2 0 2.3.5 3.1 1.2l1.2-1.3C11.7 4.8 10.2 4.2 8.5 4.2S5.3 4.8 4.2 5.9L5.4 7.2C6.2 6.5 7.3 6 8.5 6zm0 3.6c.6 0 1.2.2 1.6.7l-1.6 1.7-1.6-1.7c.4-.5 1-.7 1.6-.7z"/></svg>
+      <svg width="18" height="13" viewBox="0 0 18 13"><rect x="0" y="9" width="3" height="4" rx=".5"/><rect x="4.5" y="6" width="3" height="7" rx=".5"/><rect x="9" y="3" width="3" height="10" rx=".5"/><rect x="13.5" y="0" width="3" height="13" rx=".5"/></svg>
+      <span style="display:inline-flex;align-items:center;gap:2px">
+        <svg width="22" height="13" viewBox="0 0 22 13" fill="none"><rect x="1" y="1.5" width="17" height="10" rx="2.4" stroke="currentColor" stroke-width="1.3"/><rect x="2.6" y="3" width="11" height="7" rx="1" fill="currentColor"/><rect x="19" y="4.5" width="1.8" height="4" rx=".9" fill="currentColor"/></svg>
+        <b style="font-size:12px">72%</b>
+      </span>
+    </span>
+  </div>
+
+  <div class="header">
+    <button class="icon-btn" aria-label="Back">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20z"/></svg>
+    </button>
+    <div class="avatar" aria-hidden="true"><img id="hvLogo" alt=""></div>
+    <div class="peer" role="button" tabindex="0">
+      <span class="name">
+        <span>Health Vectors</span>
+        <svg class="verified" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-label="Verified business">
+          <path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2 18.6 6.8z"/>
+        </svg>
+      </span>
+      <span class="sub">Business account · tap for info</span>
+    </div>
+    <button class="icon-btn" aria-label="Video call"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg></button>
+    <button class="icon-btn" aria-label="Voice call"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.7.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.7.1.3 0 .7-.2 1l-2.4 2.1z"/></svg></button>
+    <button class="icon-btn" aria-label="More"><svg width="6" height="22" viewBox="0 0 6 22" fill="currentColor"><circle cx="3" cy="3" r="2.4"/><circle cx="3" cy="11" r="2.4"/><circle cx="3" cy="19" r="2.4"/></svg></button>
+  </div>
+
+  <div class="chat" id="chat" role="log" aria-live="polite"></div>
+
+  <button class="scrolldown" id="scrolldown" aria-label="Scroll to bottom">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16l-6-6 1.4-1.4L12 13.2l4.6-4.6L18 10z"/></svg>
+  </button>
+
+  <div class="inputbar">
+    <div class="composer">
+      <span class="emoji" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zM8.5 11a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm7 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM12 17.5c2.3 0 4.3-1.4 5-3.5H7c.7 2.1 2.7 3.5 5 3.5z"/></svg>
+      </span>
+      <input id="msgInput" type="text" placeholder="Message" autocomplete="off" aria-label="Message">
+      <button class="cbtn" aria-label="Attach"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 6v11.5a4.5 4.5 0 01-9 0V5a3 3 0 016 0v10.5a1.5 1.5 0 01-3 0V6H9v9.5a3 3 0 006 0V5a4.5 4.5 0 00-9 0v12.5a6 6 0 0012 0V6h-1.5z"/></svg></button>
+      <button class="cbtn" aria-label="Camera"><svg width="23" height="23" viewBox="0 0 24 24" fill="currentColor"><path d="M9.5 4l-1.7 2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-2.8l-1.7-2h-5zM12 17a4 4 0 110-8 4 4 0 010 8zm0-2a2 2 0 100-4 2 2 0 000 4z"/></svg></button>
+    </div>
+    <button class="send-fab" id="sendBtn" aria-label="Send / Voice message">
+      <svg id="fabIcon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V22h2v-3.1A7 7 0 0019 12h-2z"/></svg>
+    </button>
+  </div>
+
+  <div class="sheet-overlay" id="sheetOverlay"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="List message">
+    <div class="sheet-grip"></div>
+    <div class="sheet-head">
+      <button class="x" id="sheetClose" aria-label="Close"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.3 5.7L12 12l6.3 6.3-1.4 1.4L10.6 13.4 5.7 18.3 4.3 16.9 10.6 12 4.3 5.7l1.4-1.4L10.6 10.6 16.9 4.3z"/></svg></button>
+      <div class="title" id="sheetTitle">Explore your report</div>
+    </div>
+    <div class="sheet-list" id="sheetList"></div>
+    <div class="sheet-foot" id="sheetFoot">Powered by WhatsApp</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  //  V4.1 COPY RULES  (derived from system_prompt_5.txt)
+  //
+  //  STRATEGIC POSITIONING — Customer Retention Engine for Diagnostic Lab:
+  //    • HealthVectors = deep biomarker intelligence company.
+  //    • We don't say "fresh sample confirms" · we say "your pattern
+  //      tells us what follow-up tests to run, like a doctor would."
+  //    • Primary CTA = DIAGNOSTIC LAB PANEL BOOKING (home collection).
+  //    • Doctor consultation = secondary support, not the main conversion.
+  //    • Every message pushes the user toward re-testing their required
+  //      follow-up panel (condition-specific + general wellness).
+  //    • Frame: "Based on your biomarkers, here's the panel a doctor
+  //      would order. Book it at our lab."
+  //
+  //  WA CONSENT PROTOCOL (v4.1 addition):
+  //    • Before any marketing or conversational message, send a
+  //      consent request: "Would you like us to share your expert
+  //      analysis?"  Buttons: [Yes, please] [Not now]
+  //    • Only after user confirms consent do we deliver the analysis
+  //      and any follow-up booking prompts.
+  //    • "Not now" goes to doLater() (no pressure, door stays open).
+  //    • This mirrors WA Business API policy: no marketing/conversational
+  //      message without prior user consent.
+  //
+  //  EXPERT ANALYSIS (v4.1 addition — doAnalysis):
+  //    • HealthVectors' differentiator is deep biomarker intelligence.
+  //    • The expert analysis summarises the multi-system pattern in
+  //      plain, calm language BEFORE pushing any booking CTA.
+  //    • It answers: what do my biomarkers tell us, how do the systems
+  //      relate, and what does the pattern mean — without scaring.
+  //
+  //  Every user-facing bot string in this file obeys these:
+  //   1. Max ~45 words and max 6 content lines per bubble; aim 2-4.
+  //   2. One idea per bubble. Cut the weaker idea, do not split it out.
+  //   3. Fewer bubbles than v3. Total copy volume is roughly half.
+  //   4. No throat-clearing, no restating the question, no repeated
+  //      reassurance, no sentence that would not change a decision.
+  //   5. Structure over prose: bold header line + a few list items.
+  //   6. *bold* = header line + one key phrase or test name (~3 spans max).
+  //   7. _italic_ = caveats, disclaimers, reference ranges only.
+  //   8. Bullets are ▫️ , sub-lines ↳ , status dots 🔴 🟡 🟢 ,
+  //      and • only inside a single-line inline series.
+  //   9. One leading emoji per header line, at most one more per bubble,
+  //      and it must carry meaning (🩸 🫀 🧪 📄 📍 📅 👩‍⚕️ ⏱️ ✅ 💙).
+  //  10. No markdown headers, no - or * bullets, no numbered lists.
+  //  11. Second person throughout. Plain words, no bare jargon.
+  //  12. Every line answers what / why / where / how, or it is deleted.
+  //  13. No exclamation marks. 14. No em-dashes.
+  //  15. Banned in patient copy: strain, damage, risk, danger, warning,
+  //      serious, urgent, alarming, critical, immediately, asap, hurry,
+  //      right away, act now, don't delay, "I understand / I see you / I hear you". Priority
+  //      reads as 🔴 Act on first / 🟡 Keep an eye on / 🟢 Doing well.
+  //      Internal JS keys (urgentItems, state:'urgent', riskWtg) are
+  //      unchanged. doSafety() may stay directive and may say emergency.
+  //  16. Never say the body is working harder, struggling or failing.
+  //  17. Never invent symptoms beyond what the R object already holds.
+  //  18. Follow-up tests are named individually, once per act.
+  //  19. Exactly one greeting, at the very start of the conversation.
+  //  20. Keyword tokens (*MENU* *DOCTOR* *TALK* *STOP* *START*) stay
+  //      intact and bold, because handleSend() routing depends on them.
+  //  21. Never use "confirming with a fresh sample" framing. Your
+  //      biomarker intelligence gives enough to recommend a panel.
+  //  22. Primary CTA is always lab panel booking. Doctor consult is
+  //      secondary and clearly labelled as such.
+  //  23. Consent first: never deliver the analysis or booking CTA
+  //      without a prior consent button from the user.
+  //  24. Expert analysis comes before booking. The summary of what
+  //      the biomarkers mean earns the right to ask for the follow-up.
+  // ============================================================
+
+  // ============================================================
+  // 1.  Asset loading  (Health Vectors logo, WA-style doodle)
+  // ============================================================
+  var logoImg = document.getElementById('hvLogo');
+  fetch('logo.b64').then(function(r){return r.ok?r.text():Promise.reject();})
+    .then(function(b64){ logoImg.src = 'data:image/webp;base64,'+b64.trim(); })
+    .catch(function(){ logoImg.src = 'HVai-logo.webp'; });
+
+  var doodle = "url(\"data:image/svg+xml;utf8," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="340" height="340" viewBox="0 0 340 340">' +
+    '<g fill="none" stroke="%23a9b7ad" stroke-width="2" stroke-linecap="round" opacity="0.85">' +
+    '<path d="M20 60h14l6-14 8 26 6-12h16"/>' +
+    '<circle cx="120" cy="46" r="12"/><path d="M120 40v12M114 46h12"/>' +
+    '<path d="M205 30c0 6 10 8 10 14s-10 8-10 14"/><path d="M215 30c0 6-10 8-10 14s10 8 10 14"/>' +
+    '<path d="M285 40c10 0 16 9 16 16 0 8-16 20-16 20s-16-12-16-20c0-7 6-16 16-16z"/>' +
+    '<path d="M30 170h14l6-14 8 26 6-12h16"/>' +
+    '<circle cx="130" cy="160" r="6"/><path d="M130 166v14M123 186h14l-3-6h-8z"/>' +
+    '<rect x="200" y="150" width="26" height="34" rx="4"/><path d="M206 160h14M206 168h14M206 176h8"/>' +
+    '<circle cx="300" cy="166" r="12"/><path d="M300 160v12M294 166h12"/>' +
+    '<path d="M30 285c10 0 16 9 16 16 0 8-16 20-16 20s-16-12-16-20c0-7 6-16 16-16z"/>' +
+    '<path d="M120 280h14l6-14 8 26 6-12h16"/>' +
+    '<path d="M205 280c0 6 10 8 10 14s-10 8-10 14"/><path d="M215 280c0 6-10 8-10 14s10 8 10 14"/>' +
+    '<circle cx="300" cy="296" r="12"/><path d="M294 296h12M300 290v12"/>' +
+    '</g></svg>'
+  ) + "\")";
+  document.documentElement.style.setProperty('--doodle', doodle);
+
+  // ============================================================
+  // 2.  Report data (mirrors hcl-worse.json · severe multi-system case)
+  //     Tone note: this is a WORSE-case template. Every line of copy
+  //     downstream is written for someone opening a scary report on
+  //     their phone. Bold/emojis are used as containment, not celebration.
+  // ============================================================
+  var R = {
+    // Stub gives firstName:null · using a warm placeholder for the mock.
+    name:'Priya', fullName:'Priya Nair', age:47, gender:'Female',
+    testDate:'12 May 2026', lab:'Medicover Hospitals', pkg:'Essential Report',
+    // Health CIBIL score bucket 0-300 = "Caution" (the lowest of four)
+    score:251, scoreMax:1000, grade:'F', scoreLabel:'Caution',
+    corpAvg:713, corpAvgLabel:'Fair',
+    total:82, normal:56, watch:19, urgent:6,   // rough count from the panel
+    // The FEW things that flagged urgent · kept short on purpose.
+    // Displayed only in doPriority(), never in the opening message.
+    urgentItems:[
+      {n:'Creatinine',     v:'5.57 mg/dL',  r:'0.6–1.2',   note:'kidney marker'},
+      {n:'Haemoglobin',    v:'1.9 g/dL',    r:'12.0–15.0', note:'oxygen-carrying protein'},
+      {n:'TSH · T3 · T4',  v:'all outside range', r:'thyroid panel', note:'endocrine'},
+      {n:'Sodium',         v:'170 mmol/L',  r:'136–145',   note:'electrolyte'},
+      {n:'Total Bilirubin',v:'5.4 mg/dL',   r:'< 1.2',     note:'liver marker'}
+    ],
+    // Values so extreme a doctor would typically order a follow-up panel FIRST.
+    // Presenting this honestly is the single most empathetic move in a report like this.
+    verifyItems:[
+      {n:'Haemoglobin',   v:'1.9 g/dL'},
+      {n:'Serum Albumin', v:'14.1 g/dL'},
+      {n:'Sodium',        v:'170 mmol/L'}
+    ],
+    // The manageable, largely reversible tier. Framed with hope in copy.
+    manageItems:[
+      {n:'HbA1c',         v:'6.1 %',        r:'< 5.7',   hope:'reversible with lifestyle'},
+      {n:'Fasting glucose',v:'120 mg/dL',   r:'70–100',  hope:'follows the HbA1c back'},
+      {n:'LDL cholesterol',v:'120 mg/dL',   r:'< 100',   hope:'diet and activity move this'},
+      {n:'HDL cholesterol',v:'33 mg/dL',    r:'40–80',   hope:'rises with activity'},
+      {n:'Triglycerides', v:'173 mg/dL',    r:'< 150',   hope:'less sugar helps quickly'}
+    ],
+    // Multi-organ pattern already surfaced by the model · kept short.
+    afflictions:['Thyroid','Kidney','Liver','Lipid','Glucose','Anaemia','Electrolytes'],
+    // Cardiovascular / diabetes / hypertension risk contribution · from CIBIL block
+    riskWtg:{ cvd:67, diabetes:46, htn:31 },
+    // Follow-up schedule (from data.recommendations.follow_up)
+    followUp:{
+      week1: ['Serum Creatinine'],
+      week6: ['TSH', 'FT3 & FT4'],
+      month3: ['HbA1c','FBS & PPBS','Fasting Lipid Profile','Serum Albumin','CBC','Peripheral Smear','Serum Creatinine','Liver Function Test']
+    },
+    // Additional tests the algorithm suggests (data.recommendations.additional_tests)
+    additionalTests:[
+      'Urine Albumin/Creatinine Ratio',
+      'Abdominal Ultrasound',
+      'Peripheral Smear',
+      'FT3 & FT4 · TPO antibodies',
+      'Serum Iron · Ferritin'
+    ],
+    // Medical specialists mapped in data.recommendations.medical.advice
+    specialists:[
+      {who:'Endocrinologist', why:'thyroid + sugar'},
+      {who:'Nephrologist',    why:'kidney + electrolytes + anaemia'},
+      {who:'General Physician',why:'liver + cholesterol'},
+      {who:'Haematologist',   why:'platelets + white cells'}
+    ],
+    // System-by-system flags (colour-coded from the raw stub)
+    systems:[
+      {name:'Cardiovascular',       state:'watch',  note:'LDL/HDL/TG all out of range'},
+      {name:'Blood Sugar',          state:'watch',  note:'HbA1c 6.1 · Fasting 120 · prediabetic'},
+      {name:'Kidney',               state:'urgent', note:'Creatinine 5.57 · needs prompt review'},
+      {name:'Liver',                state:'urgent', note:'Bilirubin, ALP, SGPT all elevated'},
+      {name:'Thyroid',              state:'urgent', note:'TSH + T3/T4 all high · unusual pattern'},
+      {name:'Blood Count',          state:'urgent', note:'Haemoglobin very low; platelets high'},
+      {name:'Electrolytes',         state:'urgent', note:'Sodium 170 · Chloride 74'},
+      {name:'Urine Routine',        state:'ok',     note:'Largely unremarkable'}
+    ]
+  };
+
+  // ============================================================
+  // 3.  Formatting helpers  (WA-supported markdown only)
+  //     *bold*   _italic_   ~strike~   ```mono```
+  // ============================================================
+  var chat = document.getElementById('chat');
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function fmt(s){
+    var out = esc(s);
+    // triple backtick → monospace. WA supports multi-line blocks, which makes
+    // fixed-width bar charts (█ ░) render correctly · see barChart() below.
+    out = out.replace(/```([\s\S]+?)```/g,function(_,body){
+      return '<code class="mono-block">'+body.replace(/^\n|\n$/g,'')+'</code>';
+    });
+    // links
+    out = out.replace(/(https?:\/\/[^\s]+)/g,function(m){var c=m.replace(/[.,)]+$/,'');return '<a href="'+c+'" target="_blank" rel="noopener">'+c+'</a>'+m.slice(c.length);});
+    // *bold*
+    out = out.replace(/\*([^*\n]+)\*/g,'<strong>$1</strong>');
+    // _italic_
+    out = out.replace(/(^|[\s(])_([^_\n]+)_(?=[\s).,!?]|$)/g,'$1<em>$2</em>');
+    // ~strike~
+    out = out.replace(/~([^~\n]+)~/g,'<s>$1</s>');
+    return out;
+  }
+  function ticks(){return '<span class="ticks"><svg width="16" height="11" viewBox="0 0 18 11" fill="currentColor"><path d="M6.6 10.6L1.3 5.3l1.1-1.1 4.2 4.2 1.1 1.1-1.1 1.1zm5 0L6.3 5.3l1.1-1.1 4.2 4.2L16.7 2 17.8 3.1 11.6 10.6z"/></svg></span>';}
+  function scrollDown(){chat.scrollTop=chat.scrollHeight;}
+
+  // ============================================================
+  // 4.  Generic message builder · every message is ONE of:
+  //      text | image | document | location | interactive | reaction
+  //     with the sub-parts (header/body/footer/buttons) WA supports.
+  // ============================================================
+  var lastFrom = null;
+  function addSystem(txt, html){
+    var w=document.createElement('div'); w.className='sysnote-wrap';
+    var lock='<svg class="lock" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a5 5 0 00-5 5v3H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2v-9a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 8V6a3 3 0 016 0v3H9z"/></svg>';
+    w.innerHTML = '<div class="sysnote">'+lock+(html?txt:esc(txt))+'</div>';
+    chat.appendChild(w); lastFrom = null; scrollDown();
+  }
+  function addDate(label){var w=document.createElement('div');w.className='datechip-wrap';
+    w.innerHTML='<div class="datechip">'+esc(label)+'</div>';chat.appendChild(w);lastFrom=null;}
+
+  function addMsg(o){
+    // 'system' encryption/template notices go through addSystem
+    if(o.from === 'system'){ return addSystem(o.text, o.html); }
+    if(LINT && o.from === 'bot' && o.text){ lintCopy(o.text); }
+
+    var row = document.createElement('div');
+    var isOut = o.from === 'user';
+    var grouped = (o.from === lastFrom);
+    row.className = 'row ' + (isOut ? 'out' : 'in') + (grouped ? ' grouped' : '');
+    lastFrom = o.from;
+
+    var b = document.createElement('div');
+    b.className = 'bubble';
+    var inner = '';
+
+    /* ---- interactive header, only text or image (WA supports text/image/video/document) ---- */
+    if(o.image){
+      inner += '<div class="wa-image"><img alt="" src="'+o.image+'"></div>';
+    }
+    if(o.document){
+      inner += '<div class="wa-doc">'+
+        '<div class="ico">'+esc(o.document.ext||'PDF')+'</div>'+
+        '<div class="info"><div class="fname">'+esc(o.document.filename)+'</div>'+
+        '<div class="fmeta">'+esc(o.document.pages||'')+(o.document.pages&&o.document.size?' · ':'')+esc(o.document.size||'')+' · '+esc((o.document.ext||'pdf').toLowerCase())+'</div></div>'+
+        '<div class="dl"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6l3.3-3.3L16.7 12 12 16.7 7.3 12l1.4-1.4L12 13.6V3zM5 18h14v2H5z"/></svg></div>'+
+        '</div>';
+    }
+    if(o.location){
+      inner += '<div class="wa-loc">'+
+        '<svg viewBox="0 0 300 150" preserveAspectRatio="none">'+
+          '<rect width="300" height="150" fill="#e8ecef"/>'+
+          '<path d="M0 40 L120 60 L180 20 L300 45 L300 70 L200 55 L100 90 L0 75 Z" fill="#d5dbdf"/>'+
+          '<path d="M0 90 L80 105 L160 85 L240 110 L300 100 L300 150 L0 150 Z" fill="#c9d0d4"/>'+
+          '<path d="M40 30 L280 30" stroke="#f2b134" stroke-width="4" stroke-linecap="round" opacity=".65"/>'+
+          '<path d="M30 70 L270 90" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>'+
+          '<path d="M20 120 L290 110" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity=".8"/>'+
+        '</svg>'+
+        '<svg class="pin" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 00-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 00-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>'+
+      '</div>'+
+      '<div class="loc-meta">'+
+        '<div class="lname">'+esc(o.location.name)+'</div>'+
+        '<div class="laddr">'+esc(o.location.address)+'</div>'+
+      '</div>';
+    }
+    if(o.headerText){
+      inner += '<div class="ix-header">'+esc(o.headerText)+'</div>';
+    }
+
+    /* ---- body / caption ---- */
+    var text = o.text ? fmt(o.text) : '';
+    var footer = o.footer ? '<div class="ix-footer">'+esc(o.footer)+'</div>' : '';
+    var metaHtml = o.time ? '<span class="meta">'+esc(o.time)+(isOut?ticks():'')+'</span>' : '';
+    if(text){ inner += '<div class="btext">'+text+(footer?'</div>'+footer+'<div class="btext" style="padding:0">'+metaHtml:metaHtml)+'</div>'; }
+    else if(footer){ inner += footer + '<div class="btext" style="padding:0">'+metaHtml+'</div>'; }
+    else if(metaHtml){ inner += '<div class="btext">'+metaHtml+'</div>'; }
+
+    /* ---- interactive footer buttons (mutually exclusive per WA spec) ---- */
+    if(o.buttons && o.buttons.length){
+      // up to 3 reply buttons, each title ≤20 chars · enforced softly by slice()
+      var q='<div class="qr">';
+      o.buttons.slice(0,3).forEach(function(btn,i){
+        q+='<button data-btn="'+i+'">'+
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 9V5l-7 7 7 7v-4c5 0 8.5 1.6 11 5-1-5-4-10-11-11z"/></svg>'+
+          esc(btn.title.slice(0,20))+
+        '</button>';
+      });
+      q+='</div>';
+      inner += q;
+    }
+    if(o.list){
+      inner += '<div class="list-opener" data-list="1">'+
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="4" cy="6" r="1.7"/><circle cx="4" cy="12" r="1.7"/><circle cx="4" cy="18" r="1.7"/><path d="M9 5h12v2H9zM9 11h12v2H9zM9 17h12v2H9z"/></svg>'+
+        '<span>'+esc(o.list.button)+'</span></div>';
+    }
+    if(o.cta){
+      inner += '<div class="cta-url" data-cta="1">'+
+        '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3h-7zM19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7z"/></svg>'+
+        '<span>'+esc(o.cta.label)+'</span></div>';
+    }
+
+    b.innerHTML = inner;
+    if(o.reaction){
+      var r=document.createElement('div');r.className='rx';r.textContent=o.reaction;b.appendChild(r);
+    }
+    row.appendChild(b);
+    chat.appendChild(row);
+
+    /* ---- wire up interactives ---- */
+    if(o.buttons){
+      b.querySelectorAll('[data-btn]').forEach(function(el){
+        el.addEventListener('click', function(){
+          b.querySelectorAll('[data-btn]').forEach(function(x){x.disabled=true;});
+          var idx=+el.getAttribute('data-btn');
+          o.buttons[idx].onClick && o.buttons[idx].onClick();
+        });
+      });
+    }
+    if(o.list){
+      var opener = b.querySelector('[data-list]');
+      opener.addEventListener('click', function(){
+        openSheet(o.list.title||'Options', o.list.sections, o.list.footer, function(row){
+          userSend(row.title);
+          row.onSelect && row.onSelect();
+        });
+      });
+    }
+    if(o.cta){
+      b.querySelector('[data-cta]').addEventListener('click', function(){
+        o.cta.onClick && o.cta.onClick();
+      });
+    }
+    scrollDown();
+    return row;
+  }
+
+  // ============================================================
+  //  Dev-only copy linter. Enable with ?lint=1 .
+  //  Flags v4 rule violations on bot bubbles: >45 words, presence of "!",
+  //  presence of an em-dash, banned words, or more than 6 lines. Reports via
+  //  console.warn only. Never alters rendering and never throws.
+  // ============================================================
+  var LINT = /[?&]lint=1/.test(location.search);
+  var BANNED = /\b(strain|damage|risk|danger|warning|serious|urgent|alarming|critical|immediately|asap|hurry|right away|act now|don'?t delay|i understand|i see you|i hear you)\b/i;
+  function lintCopy(t){
+    try{
+      if(!t || typeof t !== 'string') return;
+      // Strip WA markdown so the count reflects visible words.
+      var plain = t.replace(/\*([^*\n]+)\*/g,'$1')
+                   .replace(/_([^_\n]+)_/g,'$1')
+                   .replace(/~([^~\n]+)~/g,'$1')
+                   .replace(/```[\s\S]*?```/g,'');
+      var words = plain.trim().split(/\s+/).filter(Boolean).length;
+      var lines = t.split('\n').length;
+      var snip  = plain.slice(0,80).replace(/\s+/g,' ');
+      if(words > 45)         console.warn('[copy] >45 words ('+words+')', snip);
+      if(lines > 6)          console.warn('[copy] >6 lines ('+lines+')', snip);
+      if(/!/.test(t))        console.warn('[copy] exclamation mark',      snip);
+      if(/\u2014/.test(t))        console.warn('[copy] em-dash',               snip);
+      var m = t.match(BANNED);
+      if(m)                  console.warn('[copy] banned word: '+m[0],    snip);
+    }catch(_){ /* linter must never break the app */ }
+  }
+
+  // ============================================================
+  // 5.  Typing indicator + say-in-sequence helper
+  // ============================================================
+  function botTyping(cb, delay){
+    var row=document.createElement('div');row.className='row in typing';
+    row.innerHTML='<div class="bubble"><div class="dots"><i></i><i></i><i></i></div></div>';
+    chat.appendChild(row);lastFrom=null;scrollDown();
+    setTimeout(function(){row.remove();cb();}, delay||850);
+  }
+  function botSay(list, done){
+    var i=0;
+    (function next(){
+      if(i>=list.length){done&&done();return;}
+      var item=list[i++];
+      botTyping(function(){addMsg(Object.assign({from:'bot',time:timeNow()},item));next();}, item._delay||850);
+    })();
+  }
+  function timeNow(){return '11:35 am';}
+  function userSend(text){addMsg({from:'user', text:text, time:timeNow()});}
+
+  // ------------------------------------------------------------
+  // Text bar chart · block characters inside a WA monospace block.
+  // Fully native: it's just text, so it survives any WA client.
+  // Keep labels padded to equal width or the bars won't line up.
+  //
+  // DELIBERATELY UNUSED IN v3. In the healthy template this renders a
+  // "you vs company average" comparison. Here that chart would read
+  // 251 against 713 · a humiliation bar, not information. Ranking
+  // someone against their colleagues is fine when they're winning and
+  // cruel when they aren't. Kept only so v2 and v3 share one shell.
+  // ------------------------------------------------------------
+  function barChart(rows, width){
+    width = width || 14;
+    var labelW = Math.max.apply(null, rows.map(function(r){return r.label.length;}));
+    var maxV   = Math.max.apply(null, rows.map(function(r){return r.value;}));
+    return rows.map(function(r){
+      var filled = Math.round(r.value / maxV * width);
+      return r.label + Array(labelW - r.label.length + 2).join(' ') +
+             Array(filled + 1).join('█') + Array(width - filled + 1).join('░') +
+             '  ' + r.display;
+    }).join('\n');
+  }
+
+  // ============================================================
+  // 6.  Server-generated summary card (native IMAGE message)
+  //     WA can't render custom UI inside a bubble · so anything
+  //     visual has to be a pre-rendered PNG / JPG the API sends
+  //     as an image message with a caption.
+  // ============================================================
+  // NOTE: worse-case visual language.
+  //   - No celebratory teal/green fill; muted deep-slate ground.
+  //   - The large number is de-emphasised (smaller, softer), because leading
+  //     with "251 / 1000" on a phone-lock-screen preview is unkind.
+  //   - The HEADLINE is "Report ready · needs a careful review", not the score.
+  //   - The gauge is a soft amber, not red · red on a lock-screen thumbnail
+  //     lands as alarm; amber lands as attention. The doctor callout below
+  //     the gauge is what actually carries the message.
+  function scoreCardDataUrl(){
+    var c=document.createElement('canvas'); c.width=800; c.height=420;
+    var g=c.getContext('2d');
+    // Calm slate-blue ground · serious, not alarming.
+    var grd=g.createLinearGradient(0,0,800,420);
+    grd.addColorStop(0,'#2b3a55'); grd.addColorStop(1,'#3b4a63');
+    g.fillStyle=grd; g.fillRect(0,0,800,420);
+    // Small brand mark, not a shout.
+    g.fillStyle='rgba(255,255,255,.75)'; g.font='500 16px Roboto,sans-serif';
+    g.fillText('HEALTH VECTORS  ·  '+R.pkg, 40, 48);
+
+    // The actual headline · this is what a passer-by should read first.
+    g.fillStyle='#ffffff'; g.font='600 34px Roboto,sans-serif';
+    g.fillText('Your report is ready', 40, 108);
+    g.fillStyle='rgba(255,255,255,.88)'; g.font='400 20px Roboto,sans-serif';
+    g.fillText('A few readings to go through with your doctor.', 40, 140);
+
+    // Number quietly, on the RIGHT side, small · factual, not a slap.
+    g.fillStyle='rgba(255,255,255,.78)'; g.font='500 16px Roboto,sans-serif';
+    g.fillText('Health score', 620, 96);
+    g.fillStyle='#ffffff';                g.font='700 44px Roboto,sans-serif';
+    g.fillText(String(R.score),            620, 138);
+    g.fillStyle='rgba(255,255,255,.65)'; g.font='500 16px Roboto,sans-serif';
+    g.fillText('/ '+R.scoreMax+'  ·  '+R.scoreLabel, 620, 162);
+
+    // Gauge · soft amber, gentle terminator dot
+    g.fillStyle='rgba(255,255,255,.20)'; roundRect(g,40,200,720,14,7); g.fill();
+    var pct=Math.max(0.04, R.score/R.scoreMax);
+    g.fillStyle='#e8a86a';                roundRect(g,40,200,720*pct,14,7); g.fill();
+    g.fillStyle='#ffffff'; g.beginPath(); g.arc(40+720*pct,207,10,0,Math.PI*2); g.fill();
+
+    // Care-forward callout: doctor consultation covered.
+    // (Requisites in the stub already mark consultation.required = true.)
+    g.fillStyle='rgba(255,255,255,.10)'; roundRect(g,40,248,720,86,10); g.fill();
+    g.fillStyle='#ffffff'; g.font='600 20px Roboto,sans-serif';
+    g.fillText('A free doctor consultation is arranged', 62, 280);
+    g.fillStyle='rgba(255,255,255,.82)'; g.font='400 16px Roboto,sans-serif';
+    g.fillText('Covered under your Medicover corporate plan.', 62, 306);
+    g.fillText('You will not be working this out on your own.', 62, 326);
+
+    g.font='500 14px Roboto,sans-serif'; g.fillStyle='rgba(255,255,255,.60)';
+    g.fillText('Tested '+R.testDate+'  ·  '+R.gender+', '+R.age+'  ·  Not a diagnosis. For review with your doctor', 40, 380);
+    return c.toDataURL('image/png');
+  }
+  function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+
+  // ============================================================
+  // 7.  Bottom sheet (List message renderer)
+  // ============================================================
+  var sheet=document.getElementById('sheet'), sheetOverlay=document.getElementById('sheetOverlay'),
+      sheetList=document.getElementById('sheetList'), sheetCloseBtn=document.getElementById('sheetClose'),
+      sheetTitleEl=document.getElementById('sheetTitle'), sheetFoot=document.getElementById('sheetFoot'),
+      pendingCb=null;
+  function openSheet(title, sections, footer, cb){
+    sheetTitleEl.textContent = title;
+    sheetFoot.textContent = footer || '';
+    sheetFoot.style.display = footer ? 'block' : 'none';
+    pendingCb=cb; sheetList.innerHTML='';
+    sections.forEach(function(sec){
+      if(sec.title){
+        var s=document.createElement('div');s.className='sheet-section';s.textContent=sec.title;sheetList.appendChild(s);
+      }
+      sec.rows.forEach(function(r){
+        var it=document.createElement('div'); it.className='sheet-row';
+        it.innerHTML='<div class="rtxt"><div class="rtitle">'+esc(r.title)+'</div>'+
+          (r.description?'<div class="rdesc">'+esc(r.description)+'</div>':'')+
+          '</div><div class="radio"></div>';
+        it.addEventListener('click', function(){
+          closeSheet(); var c=pendingCb; pendingCb=null;
+          setTimeout(function(){ c && c(r); },170);
+        });
+        sheetList.appendChild(it);
+      });
+    });
+    sheetOverlay.classList.add('open');
+    requestAnimationFrame(function(){ sheet.classList.add('open'); });
+  }
+  function closeSheet(){ sheet.classList.remove('open'); sheetOverlay.classList.remove('open'); }
+  sheetOverlay.addEventListener('click', closeSheet);
+  sheetCloseBtn.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeSheet(); });
+
+  // ============================================================
+  // 8.  Conversation flow · v4.1 · Cloud API native shapes only
+  //
+  //  Flow:
+  //    1. E2E notice + Utility template banner (report ready)
+  //    2. WA CONSENT REQUEST — before any marketing/analysis
+  //    3. [on consent] Expert analysis summary (doAnalysis)
+  //    4. Follow-up panel details (doPlan)
+  //    5. Lab booking CTA (doBook) + menu
+  //    6. [on "not now"] doLater() — door stays open
+  // ============================================================
+
+  // --- system notices (WA renders these grey, small, centred) ---
+  addSystem('Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them. Tap to learn more.');
+
+  addDate('12 May 2026');
+  // Utility template banner · this is the ONLY pre-consent message WA allows.
+  addSystem('This business sent an approved <b>Utility</b> template to notify you your report is ready.', true);
+
+  // ---- Step 1: Consent request (WA policy: no marketing/analysis without consent) ----
+  // This is a native interactive.button message · WA requires it before any
+  // conversational or marketing message flows.
+  addMsg({
+    from: 'bot', time: '2:14 pm',
+    text: "Hi "+R.name+". 📄\n\n"+
+          "Your test report from *"+R.lab+"* is ready.\n\n"+
+          "We can share a detailed expert analysis of your biomarkers and help you plan the next steps. Would you like us to send it?",
+    footer: "Health Vectors · verified",
+    buttons: [
+      {title:'Yes, show me', onClick: function(){ userSend('Yes, show me'); openWindow(); doConsentYes(); }},
+      {title:'Not now',     onClick: function(){ userSend('Not now');      openWindow(); doLater(); }}
+    ]
+  });
+
+  // ---- Step 2 (on consent): Expert analysis + follow-up + booking ----
+  function doConsentYes(){
+    // Expert analysis — the first thing they see after consenting.
+    // Presents HealthVectors' deep biomarker understanding without scaring.
+    doAnalysis();
+  }
+
+  // ============================================================
+  // 9.  24-hour session note (fires once the user replies)
+  // ============================================================
+  var windowOpened=false;
+  function openWindow(){
+    if(windowOpened) return; windowOpened=true;
+    addSystem('You replied. A <b>24-hour customer service window</b> is now open, so we can chat freely.', true);
+  }
+
+  // ============================================================
+  // 10.  ACT 0 · EXPERT ANALYSIS SUMMARY (NEW in v4.1)
+  //      HealthVectors' differentiator is deep biomarker intelligence.
+  //      Before pushing any booking CTA, the user gets a calm,
+  //      organised overview of what their biomarkers actually tell us.
+  //      Multi-system pattern explained in plain language · no scare.
+  //      Three short bubbles: overall picture → system summary →
+  //      what this means for next steps.
+  // ============================================================
+  function doAnalysis(){
+    var urgentList = R.urgentItems.map(function(u){ return "▫️ *"+u.n+"*  "+u.v+" ("+u.note+")"; }).join('\n');
+    var watchList  = R.manageItems.map(function(m){ return "▫️ *"+m.n+"*  "+m.v+"  ↳ "+m.hope; }).join('\n');
+
+    botSay([
+      { text: "🩺 *Your expert analysis*\n\n"+
+              "Thank you, "+R.name+". Here's what your biomarkers are telling us, broken down clearly.\n\n"+
+              "We look at how different systems in your body relate to each other · not just one number in isolation." },
+      { _delay:1000,
+        text: "📋 *The full picture across "+R.systems.length+" systems*\n\n"+
+               "🔴 *Needs prompt attention*  "+R.systems.filter(function(s){return s.state==='urgent';}).map(function(s){return s.name;}).join(', ')+"\n"+
+               "🟡 *Worth tracking*          "+R.systems.filter(function(s){return s.state==='watch';}).map(function(s){return s.name;}).join(', ')+"\n"+
+               "🟢 *In range*                "+R.systems.filter(function(s){return s.state==='ok';}).map(function(s){return s.name;}).join(', ')+"\n\n"+
+               "_Screening results, not a diagnosis._" },
+      { _delay:1200,
+        text: "🧬 *What the pattern means*\n\n"+
+              "Your biomarkers show a multi-system pattern · thyroid, kidney, liver, blood sugar, and lipids are all pointing in a similar direction. This is exactly the kind of pattern HealthVectors is designed to catch early.\n\n"+
+              "A doctor reviewing this would typically order a *follow-up diagnostic panel* to get the full picture with fresh numbers.\n\n"+
+              "We'll walk you through what that looks like next.",
+        buttons:[
+          {title:'📅 View my panel',   onClick:function(){ userSend('View my panel');   doPlan(); }},
+          {title:'🧪 Book lab panel',  onClick:function(){ userSend('Book lab panel');  doBook(); }},
+          {title:'👩‍⚕️ Doctor consult', onClick:function(){ userSend('Doctor consult');  doDoctor(); }}
+        ]
+      }
+    ], function(){
+      // After analysis, auto-open the menu so they can choose next.
+      followUp("What would help you most next?");
+    });
+  }
+  var doSummary = doAnalysis;   // keyword alias
+
+  // ============================================================
+  // 11.  ACT 1 · THE PICTURE, GENTLY
+  //      Named, contained, and immediately followed by "and here's
+  //      what we do about it." NEVER opens with the score or letter grade.
+  // ============================================================
+  function doPicture(){
+    // Group the eight systems onto three status lines rather than eight rows.
+    var group = function(state){
+      return R.systems.filter(function(s){ return s.state === state; })
+                      .map(function(s){ return s.name; }).join(' • ');
+    };
+    botSay([
+      { text: "🩺 Your report, across "+R.systems.length+" systems.\n\n"+
+              "🔴 *Act on first*  "+group('urgent')+"\n"+
+              "🟡 *Keep an eye on*  "+group('watch')+"\n"+
+              "🟢 *Doing well*  "+group('ok')+"\n\n"+
+              "_Screening results, not a diagnosis._" },
+      { _delay:1200,
+        text: "▫️ Your biomarker pattern suggests a follow-up *diagnostic panel*.\n"+
+              "▫️ Your *doctor consultation* is also covered and available.\n\n"+
+              "Where would you like to start?",
+        buttons:[
+          {title:'View follow-up panel', onClick:function(){ userSend('View follow-up panel'); doPlan(); }},
+          {title:'Book the lab panel',   onClick:function(){ userSend('Book the lab panel');   doBook(); }},
+          {title:'Doctor consultation',  onClick:function(){ userSend('Doctor consultation');  doDoctor(); }}
+        ] }
+    ]);
+  }
+  var doStatus = doPicture;   // keyword aliases for the composer router
+  var doRecap  = doPicture;
+
+  // ============================================================
+  // 11.  ACT 2 · PRIORITIES (two tiers, few items, human)
+  //      The urgent tier is deliberately SHORT · long lists on a phone
+  //      screen become an anxiety wall. Individual numbers stay soft;
+  //      the emphasis is on "your doctor will guide this."
+  // ============================================================
+  function doPriority(){
+    // One line per item keeps each bubble inside the six-line ceiling.
+    var urg = R.urgentItems.map(function(u){
+      var ref = /^[<0-9]/.test(u.r) ? 'ref '+u.r : u.r;
+      return "▫️ "+u.n+"  "+u.v+" _("+ref+")_";
+    }).join('\n');
+    var man = R.manageItems.map(function(m){
+      return "▫️ "+m.n+"  "+m.v+" _"+m.hope+"_";
+    }).join('\n');
+
+    botSay([
+      { text: "🔴 *Act on first*\n"+urg },
+      { _delay:1200,
+        text: "🟡 *Keep an eye on*\n"+man,
+        buttons:[
+          {title:'Book the lab panel',   onClick:function(){ userSend('Book the lab panel');   doBook(); }},
+          {title:'View follow-up panel', onClick:function(){ userSend('View follow-up panel'); doPlan(); }},
+          {title:'Talk to a person',     onClick:function(){ userSend('Talk to a person');   doTalk(); }}
+        ] }
+    ]);
+  }
+
+  // ============================================================
+  // 12.  ACT 3 · FOLLOW-UP PANEL (doctor-level recommendation)
+  //      Position the biomarker pattern as giving us enough insight
+  //      to recommend what a doctor would order next. Not a weak
+  //      "confirm the sample" framing.
+  // ============================================================
+  function doVerify(){
+    var lines = R.verifyItems.map(function(v){
+      return "▫️ *"+v.n+"* "+v.v;
+    }).join('\n');
+    botSay([
+      { text: "🧪 *Your follow-up panel*\n\n"+
+              "Your biomarker pattern points to a specific set of tests a doctor would order.\n\n"+lines+"\n"+
+              "_A screening, not a diagnosis. These guide the next step._" },
+      { _delay:1100,
+        text: "🏠 *Book the lab panel*\n\n"+
+              "▫️ Home collection, at a time you pick\n"+
+              "▫️ ~5 minutes at your door\n"+
+              "▫️ Results in 24 hours here\n"+
+              "▫️ Fully covered by your plan\n\n"+
+              "_Your doctor review is also covered._",
+        buttons:[
+          {title:'Book the lab panel',  onClick:function(){ userSend('Book the lab panel');  doBook(); }},
+          {title:'Doctor consultation',  onClick:function(){ userSend('Doctor consultation');  doDoctor(); }},
+          {title:'Back',                onClick:function(){ userSend('Back');                openMenu("What next?"); }}
+        ]
+      }
+    ]);
+  }
+
+  // ============================================================
+  // 13.  ACT 4 · DOCTOR CONSULTATION (secondary support)
+  //      Data flags consultation.required=true. Free and pre-arranged.
+  //      Doctor review is a support layer, not the primary CTA.
+  // ============================================================
+  function doDoctor(){
+    botSay([
+      { text: "👩‍⚕️ *Doctor consultation is also covered*\n\n"+
+              "A doctor has your case and can review your report in detail. Nothing to pay or arrange through your Medicover plan.\n\n"+
+              "_Likely referrals: "+R.specialists.map(function(s){return s.who.toLowerCase();}).join(', ')+"._" },
+      { _delay:1100,
+        text: "⏱️ *When suits you for the call?*",
+        buttons:[
+          {title:'Morning (9–12)',    onClick:function(){ userSend('Morning (9–12)');   afterCallback('morning'); }},
+          {title:'Afternoon (12–5)',  onClick:function(){ userSend('Afternoon (12–5)');afterCallback('afternoon'); }},
+          {title:'Evening (5–8)',     onClick:function(){ userSend('Evening (5–8)');   afterCallback('evening'); }}
+        ]
+      }
+    ]);
+  }
+  var doExpert = doDoctor;   // keyword alias
+
+  // ============================================================
+  // 14.  ACT 5 · THE FOLLOW-UP LAB PANEL (curated, doctor-level)
+  //      Present the tests as a curated diagnostic panel a doctor
+  //      would order based on the biomarker pattern. Not a loose list
+  //      of individual tests · a coherent package.
+  // ============================================================
+  function doPlan(){
+    // Each test name is named once per act, so drop repeats across the tiers.
+    var seen = {};
+    var uniq = function(list){
+      return list.map(function(t){
+        return t.split(' · ').filter(function(p){
+          var k = p.toLowerCase().trim();
+          if(seen[k]) return false;
+          seen[k] = 1; return true;
+        }).join(' · ');
+      }).filter(Boolean);
+    };
+    var w1 = uniq(R.followUp.week1).join(' • ');
+    var w6 = uniq(R.followUp.week6).join(' • ');
+    var m3 = uniq(R.followUp.month3).join(' • ');
+    var add = uniq(R.additionalTests);
+
+    botSay([
+      { text: "📅 *Your follow-up diagnostic panel*\n\n"+
+              "A doctor reviewing this biomarker pattern would typically order these next:\n\n"+
+              "▫️ *This week*  "+w1+"\n"+
+              "▫️ *In 6 weeks*  "+w6+"\n"+
+              "▫️ *In 3 months*  "+m3+"\n"+
+              "_Spaced to track progress, not just a one-time check._" },
+      { _delay:1100,
+        text: "🧩 *Additional markers your doctor may consider*\n"+
+              add.join(' • ')+"\n"+
+              "_Doctor review recommended for these._",
+        buttons:[
+          {title:'Book the lab panel',  onClick:function(){ userSend('Book the lab panel');  doBook(); }},
+          {title:'Doctor consultation', onClick:function(){ userSend('Doctor consultation'); doDoctor(); }},
+          {title:'Remind me later',     onClick:function(){ userSend('Remind me later');     doRemind(); }}
+        ] }
+    ]);
+  }
+  var doTestPlan = doPlan;   // keyword alias
+
+  // ============================================================
+  // 15.  ACT 6 · HUMAN HANDOFF (emotional safety net)
+  //      Always present, always one tap away. This is what makes
+  //      the difference between "chatbot delivered scary report"
+  //      and "product I trusted with something hard."
+  // ============================================================
+  function doTalk(){
+    botSay([{
+      text: "You're not on your own with this, "+R.name+". 🤝\n\n"+
+            "A *care coordinator*, a real person on our team, can call you today to:\n\n"+
+            "▫️ Explain the report in plain language\n"+
+            "▫️ Walk you through the follow-up lab panel\n"+
+            "▫️ Sort out logistics, collection and scheduling\n\n"+
+            "They don't rush and they don't sell.\n\n"+
+            "_This is separate from the medical consultation. Coordinators help with everything around it. The doctor handles anything clinical._",
+      buttons:[
+        {title:'Call me today',   onClick:function(){ userSend('Call me today');   afterCallback('today'); }},
+        {title:'Call me tomorrow',onClick:function(){ userSend('Call me tomorrow');afterCallback('tomorrow'); }},
+        {title:'Message instead', onClick:function(){ userSend('Message instead'); botSay([{text:"Of course. 💙\n\nA coordinator will *message you here* within the next few working hours. Anything you send in the meantime, they'll see when they arrive.\n\n_You can also send_ *BOOK* _to jump straight to lab panel booking._"}]); }}
+      ]
+    }]);
+  }
+
+  // ============================================================
+  // 11.  Main menu → WhatsApp LIST message
+  //      • max 10 rows per section, max 10 sections
+  //      • row.title ≤ 24, row.description ≤ 72
+  // ============================================================
+  // One shared menu definition. Lab panel booking is the primary CTA.
+  // Doctor consultation is secondary support.
+  function menuList(){
+    return {
+      button:'View options',
+      title:'What would help right now?',
+      footer:'Everything below is covered by your plan',
+      sections:[
+        { title:'Right now', rows:[
+          { title:'🧪 Book lab panel',       description:'Doctor-recommended follow-up diagnostics · home collection',  onSelect:doBook },
+          { title:'📅 View my panel',        description:'What a doctor would order based on your biomarkers',          onSelect:doPlan },
+          { title:'🤝 Talk to a person',     description:'Care coordinator, help around the report',                    onSelect:doTalk },
+          { title:'👩‍⚕️ Doctor consult',      description:'Free consultation · already arranged for you',                 onSelect:doDoctor }
+        ]},
+        { title:'Understand my report', rows:[
+          { title:'📋 What matters most',    description:'Act on first, then what to keep an eye on',                   onSelect:doPriority },
+          { title:'📊 System by system',     description:'The whole picture, colour by colour',                         onSelect:doPicture },
+          { title:'🌱 What is in range',     description:'The reassuring parts of the report',                           onSelect:doGoingWell },
+          { title:'📄 Full report (PDF)',    description:'All parameters · secure download',                              onSelect:doDocument }
+        ]},
+        { title:'Preferences', rows:[
+          { title:'⏰ Set reminders',        description:'Nudges at key follow-up points · no spam',                    onSelect:doRemind },
+          { title:'🔕 Fewer messages',       description:'Pause or stop non-essential updates',                          onSelect:doStop }
+        ]}
+      ]
+    };
+  }
+
+  function openMenu(headline){
+    addMsg({from:'bot', time:timeNow(), text:headline, list:menuList()});
+  }
+  function followUp(headline){
+    botSay([{ text:headline, list:menuList() }]);
+  }
+
+  // ============================================================
+  // 12.  Individual flows (TEXT / DOCUMENT / LOCATION / CTA_URL)
+  // ============================================================
+  // Explicitly named "in range" rather than "going well" · softer, honest.
+  // A worse-case report DOES still have parts that are normal; showing them
+  // helps someone see the whole picture, not just the bad bits.
+  function doGoingWell(){
+    botSay([{
+      text: "🌱 *The parts that came back in range*\n\n"+
+            "It's worth pausing on these. A report is never all one colour, and yours is no exception.\n\n"+
+            "🫀 *Blood pressure* · within range\n"+
+            "💧 *Urine routine* · largely unremarkable\n"+
+            "🩸 *Red-cell size and shape* · normal (MCV, MCH)\n"+
+            "🧈 *A/G ratio* · within range\n"+
+            "🫘 *Blood urea, uric acid* · within range\n"+
+            "🧪 *Total protein* · within range\n\n"+
+            "These aren't consolation prizes. They tell your doctor what *isn't* the problem, which is genuinely useful information when they're working out what is.\n\n"+
+            "_Please share the full report with your doctor rather than acting on any single line here._"
+    }], function(){ followUp("What else would help?"); });
+  }
+
+  // Kept as a keyword-router target · mirrors the priority-tier view.
+  function doWatch(){ return doPriority(); }
+
+  // Native DOCUMENT message (PDF file card).
+  function doDocument(){
+    botSay([
+      { document:{ filename:'HealthVectors_Report_'+R.name+'_'+R.testDate.replace(/ /g,'_')+'.pdf', size:'3.1 MB', pages:'18 pages', ext:'PDF' },
+        text: "📄 *Your complete report*\n\n"+
+              "The full document your doctor will work from. Every parameter, every reference range, and the algorithmic notes.\n\n"+
+              "_Please bring this to your consultation. Reading it alone may raise more questions than it answers._" },
+      { _delay:700,
+        text: "Prefer to read it in your browser first?",
+        cta:  { label:'Open in browser', onClick:function(){ addSystem('Opening secure link in browser…'); } } }
+    ], function(){ followUp("What would help you most next?"); });
+  }
+
+  // "Book" = the follow-up diagnostic lab panel (home collection).
+  // Primary CTA of the retention engine. Doctor consult lives in doDoctor().
+  function doBook(){
+    botSay([{
+      text: "🏠 *Book your follow-up lab panel*\n\n"+
+            "Home collection for the doctor-recommended diagnostic panel. Your biomarker pattern gives us a clear picture of what to run.\n\n"+
+            "🗓️ Slots from *tomorrow* onwards\n"+
+            "⏱️ ~5 minutes at your door\n"+
+            "📱 Results here within *24 hours*\n"+
+            "💳 *Fully covered*, nothing to pay\n\n"+
+            "Choose a time that suits you:",
+      cta:  { label:'Open booking portal', onClick:function(){ addSystem('Opening https://healthvectors.com/book …'); } },
+      footer: "Doctor consultation also covered, if you want a clinical review"
+    }], function(){ followUp("Anything else I can help with?"); });
+  }
+
+  // Kept generic · used by both doDoctor (medical) and doTalk (coordinator).
+  function afterCallback(slot){
+    botSay([{ text:"✅ *Booked · "+slot+"*\n\n"+
+            "You'll get a call on your registered number in that window.\n\n"+
+            "If it's not a good moment when they call, just say, they'll rearrange gently, no need to rebook.\n\n"+
+            "Between now and then, take care of yourself, "+R.name+". 💙",
+      buttons:[
+        { title:'Add to calendar',  onClick:function(){ addSystem('Opening calendar event…'); } },
+        { title:'What to prepare',  onClick:function(){ userSend('What to prepare'); doPrepare(); } },
+        { title:'Back to menu',     onClick:function(){ userSend('Back to menu'); openMenu("What else?"); } }
+      ]
+    }]);
+  }
+
+  // Little support beat: a short prep list for the consultation.
+  // Small, practical, no-cost thing this chat can uniquely help with.
+  function doPrepare(){
+    botSay([{
+      text: "📝 *A few things that help the consultation*\n\n"+
+            "None of these are required, bring what you can.\n\n"+
+            "▫️ Any *medicines or supplements* you're currently taking\n"+
+            "▫️ A note of your *last check-up*, if you have one\n"+
+            "▫️ Whether anyone in your immediate family has *diabetes, thyroid, kidney or heart* conditions\n"+
+            "▫️ How you've been *feeling in the last few weeks*, energy, sleep, appetite\n"+
+            "▫️ Any *questions on your mind*, jot them down before you forget\n\n"+
+            "The doctor will have your full report open. You don't need to memorise a single number.",
+      buttons:[
+        { title:'Back to menu',  onClick:function(){ userSend('Back to menu'); openMenu("What else?"); } }
+      ]
+    }]);
+  }
+
+  // Native LOCATION message.
+  function doLocation(){
+    botSay([
+      { location:{ name:'Medicover Diagnostics · Hitech City', address:'Plot 25, Cyber Towers, Madhapur, Hyderabad 500081' } },
+      { _delay:700,
+        text: "📍 *Your nearest collection centre*\n\n"+
+              "🚶 Walk-in for your panel, or book home collection\n"+
+              "🕖 Open *Mon–Sat, 7am–7pm*\n"+
+              "☕ Best done before 10am if you're fasting\n\n"+
+              "Tap the map above to open in Maps.",
+        buttons:[
+          { title:'Call centre',   onClick:function(){ addSystem('Dialling +91 40 1234 5678…'); } },
+          { title:'Home collection',onClick:function(){ userSend('Home collection'); doBook(); } },
+          { title:'Back to menu',  onClick:function(){ userSend('Back to menu'); openMenu("What else?"); } }
+        ]
+      }
+    ]);
+  }
+
+  // "Not right now" is a first-class option in this template · it must NOT
+  // pester or catastrophise. What it does do: leave a gentle door open, and
+  // make absolutely clear that a real person is one message away if anything
+  // shifts. This is the message a scared user might land on for a week.
+  function doLater(){
+    botSay([{
+      text: "That's completely okay, "+R.name+". 💙\n\n"+
+            "Take the time you need. Your report is *safe in your account* and nothing about it changes with time.\n\n"+
+            "A few things I want you to know before I step back:\n\n"+
+            "▫️ Your *lab panel booking stays ready*, just send *MENU* to book it anytime\n"+
+            "▫️ A *care coordinator* is on standby for the moment you want a real voice, send *TALK*\n"+
+            "▫️ If anything feels *acutely unwell*, chest pain, breathlessness or severe dizziness, please don't wait for us. See a doctor or go to A&E today.\n\n"+
+            "I won't message you again this week unless you write first. Take care of yourself."
+    }], function(){
+      // Re-engagement: two days later, a gentle nudge with the score card.
+      addDate('Today');
+      addSystem('This business sent a <b>Utility</b> template, a follow-up on your report. Reply <b>STOP</b> to pause updates.', true);
+      addMsg({
+        from: 'bot', time: '10:22 am',
+        image: scoreCardDataUrl(),
+        text: "📅 *Ten quiet minutes is all it takes*\n"+
+              "Your biomarker pattern gives us enough to recommend the next panel. Book your follow-up lab panel when you're ready.",
+        footer: "Health Vectors · verified · not a diagnosis",
+        buttons: [
+          {title:'View expert analysis', onClick: function(){ userSend('View expert analysis'); openWindow(); doAnalysis(); }},
+          {title:'Book the lab panel',   onClick: function(){ userSend('Book the lab panel');   openWindow(); doBook(); }},
+          {title:'Still not now',        onClick: function(){ userSend('Still not now');        openWindow(); doLater(); }}
+        ]
+      });
+    });
+  }
+
+  // Reminders mirror the real follow-up ladder from the report data:
+  // 1 week (creatinine) → 6 weeks (thyroid) → 3 months (full panel).
+  function doRemind(){
+    botSay([{
+      text: "⏰ *Reminders set*\n\n"+
+            "I'll send a short nudge, nothing more, at each of these points:\n\n"+
+            "▫️ *In 5 days* · creatinine follow-up\n"+
+            "▫️ *In 6 weeks* · thyroid panel\n"+
+            "▫️ *In 3 months* · full diagnostic panel\n\n"+
+            "That's it. No promotions in between. 🤝\n\n"+
+            "_Send_ *MENU* _to book your lab panel, or for anything else._",
+      buttons:[
+        { title:'🧪 Book lab panel',  onClick:function(){ userSend('Book lab panel'); doBook(); } },
+        { title:'👩‍⚕️ Doctor consult', onClick:function(){ userSend('Book doctor');   doDoctor(); } },
+        { title:'Back to menu',      onClick:function(){ userSend('Back to menu'); openMenu("What else?"); } }
+      ]
+    }]);
+  }
+
+  // ============================================================
+  //  SAFETY NET · red-flag symptoms.
+  //  Non-negotiable in a worse-case template: a chat that delivers
+  //  abnormal results MUST tell the user when to stop reading and
+  //  seek care. Reachable by keyword from any point in the flow.
+  // ============================================================
+  function doSafety(){
+    botSay([{
+      text: "🚨 *Please don't wait for us if any of this applies*\n\n"+
+            "Go to a doctor or your nearest emergency department *today* if you have:\n\n"+
+            "▫️ Chest pain or pressure\n"+
+            "▫️ Breathlessness at rest, or on light activity\n"+
+            "▫️ Severe dizziness, fainting or confusion\n"+
+            "▫️ Yellowing of the eyes or skin\n"+
+            "▫️ Very little or no urine passed in a day\n"+
+            "▫️ Swelling of the face, legs or ankles\n"+
+            "▫️ Unusual bruising or bleeding\n\n"+
+            "This chat is *not* an emergency service and I can't assess symptoms. If something feels wrong, trust that and get seen in person.\n\n"+
+            "_If you feel unsafe or in crisis, please contact your local emergency number._",
+      buttons:[
+        { title:'Talk to a person', onClick:function(){ userSend('Talk to a person'); doTalk(); } },
+        { title:'Book my doctor',   onClick:function(){ userSend('Book my doctor');   doDoctor(); } }
+      ]
+    }]);
+  }
+
+  // Opt-out, handled with care. Note the deliberate design decision:
+  // even "Stop all" does NOT sever the clinical follow-up · a pending
+  // doctor consultation on an abnormal report is a duty-of-care matter,
+  // not marketing. We say so plainly and give a way to cancel that too.
+  function doStop(){
+    botSay([{
+      text: "You're fully in control, "+R.name+". Pick whatever suits you:\n\n"+
+            "🔔 *Only my health updates* · nothing promotional\n"+
+            "⏸️ *Pause 1 month* · quiet, then I check in once\n"+
+            "🔕 *Stop all* · no further messages\n\n"+
+            "_Your report stays in your account either way._",
+      buttons: [
+        { title:'Only health', onClick:function(){ userSend('Only health updates'); botSay([{text:"Done. 👍\n\nYou'll now receive *only messages about your own health and appointments*, nothing promotional.\n\n_Send_ *MENU* _anytime to change this._"}]); } },
+        { title:'Pause 1 month',  onClick:function(){ userSend('Pause 1 month');  botSay([{text:"Paused. ⏸️\n\nNo messages for *1 month*, apart from anything about your follow-up lab panel.\n\n_Reply_ *START* _to resume sooner, or_ *MENU* _to book your panel at any time._"}]); } },
+        { title:'Stop all',        onClick:function(){ userSend('STOP');            botSay([{text:"You've been unsubscribed. ✅\n\nNo further messages from Health Vectors.\n\nOne exception I want to be transparent about: because your report has findings a doctor should see, *your care team may still attempt one call* about the follow-up panel. Tell them if you'd rather they didn't, and that will be the end of it.\n\nYour report stays safely in your account. _Reply_ *START* _anytime._\n\nTake care of yourself, "+R.name+"."}]); } }
+      ]
+    }]);
+  }
+
+  // ============================================================
+  // 13.  Composer · mic ⇄ send FAB (real WA behaviour)
+  // ============================================================
+  var msgInput=document.getElementById('msgInput'),
+      sendBtn=document.getElementById('sendBtn'),
+      fabIcon=document.getElementById('fabIcon');
+  var sendPath='<path d="M3 20l18-8L3 4v6l12 2-12 2z"/>';
+  var micPath ='<path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V22h2v-3.1A7 7 0 0019 12h-2z"/>';
+  msgInput.addEventListener('input', function(){ fabIcon.innerHTML = msgInput.value.trim() ? sendPath : micPath; });
+
+  function handleSend(){
+    var v=msgInput.value.trim(); if(!v) return;
+    msgInput.value=''; fabIcon.innerHTML=micPath;
+    userSend(v); openWindow();
+    var low=v.toLowerCase();
+    // --- Highest priority: distress and symptoms route to humans, ---
+    // --- never to a menu. Order here is a safety decision.        ---
+    if(/chest pain|can'?t breathe|cannot breathe|breathless|fainted|faint|collaps|vomit blood|blood in|severe|emergency|ambulance/.test(low))
+      return doSafety();
+    if(/scared|scary|frightened|afraid|worried|worry|anxious|panic|crying|cry|alone|depress|hopeless|dying|die|death|serious\?|am i ok|will i be/.test(low))
+      return doReassure();
+
+    if(/^stop$/.test(low)) return doStop();
+    if(/menu|start|help|^hi$|hello/.test(low)) return openMenu("Of course, "+R.name+". Here's everything I can help with 👇");
+    if(/talk|person|human|coordinator|someone|speak/.test(low)) return doTalk();
+    if(/doctor|consult|specialist|appointment/.test(low)) return doDoctor();
+    if(/symptom|warning|red flag|emergency/.test(low)) return doSafety();
+    if(/pdf|download|full report/.test(low)) return doDocument();
+    if(/recheck|repeat|confirm|verify|re-?test|wrong|mistake|error|sure/.test(low)) return doVerify();
+    if(/book|slot|collection|home visit/.test(low)) return doBook();
+    if(/prepare|prep|bring|ask the doctor/.test(low)) return doPrepare();
+    if(/lab|centre|center|location|nearest/.test(low)) return doLocation();
+    if(/plan|schedule|follow.?up|when|next test/.test(low)) return doPlan();
+    if(/remind|nudge/.test(low)) return doRemind();
+    if(/priorit|matters|urgent|worst|bad|serious/.test(low)) return doPriority();
+    if(/normal|in range|good|well|positive/.test(low)) return doGoingWell();
+    if(/later|not now|busy/.test(low)) return doLater();
+    if(/recap|summary|score|grade|stand|where|explain|walk|analysis|what does this mean/.test(low)) return doAnalysis();
+
+    botSay([{ text:"I want to make sure I answer that properly, "+R.name+".\n\n"+
+                   "If it's anything clinical, the *doctor consultation* is the right place, they can see your whole report. For anything else, pick the closest match below and I'll take it from there.",
+      list: menuList()
+    }]);
+  }
+
+  // Emotional first-aid. Triggered by worry words, before any menu.
+  // Short, warm, no numbers, and it ends by offering a human · not a link.
+  function doReassure(){
+    botSay([
+      { text: "That's a very understandable thing to feel, "+R.name+", and I'm glad you said it.\n\n"+
+              "A report like this can feel overwhelming on a screen because it shows *everything at once*, with no context and no one to ask. That's genuinely hard to read alone." },
+      { _delay:1100,
+        text: "A few things that are true and worth holding onto:\n\n"+
+              "▫️ *Nothing here has been diagnosed.* These are screening numbers, and some still need confirming.\n"+
+              "▫️ *Several of the findings are treatable or reversible*, the sugar and cholesterol results especially.\n"+
+              "▫️ *You found this early*, through a routine check-up, which is the best way anyone finds these things.\n"+
+              "▫️ *A doctor is already assigned to you*, at no cost.\n\n"+
+              "You don't have to hold this on your own. Would you like a real person to call you?",
+        buttons:[
+          { title:'Yes, call me',   onClick:function(){ userSend('Yes, call me');   doTalk(); } },
+          { title:'Book my doctor', onClick:function(){ userSend('Book my doctor'); doDoctor(); } },
+          { title:'Just the facts', onClick:function(){ userSend('Just the facts'); doPriority(); } }
+        ] }
+    ]);
+  }
+  sendBtn.addEventListener('click', handleSend);
+  msgInput.addEventListener('keydown', function(e){ if(e.key==='Enter') handleSend(); });
+
+  // ============================================================
+  // 14.  Scroll-to-bottom pill
+  // ============================================================
+  var scrolldown=document.getElementById('scrolldown');
+  chat.addEventListener('scroll', function(){
+    var nearBottom = chat.scrollHeight - chat.scrollTop - chat.clientHeight < 120;
+    scrolldown.classList.toggle('show', !nearBottom);
+  });
+  scrolldown.addEventListener('click', scrollDown);
+
+  requestAnimationFrame(function(){ chat.scrollTop = chat.scrollHeight; });
+})();
+</script>
+</body>
+</html>
